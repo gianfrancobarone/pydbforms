@@ -16,7 +16,7 @@ def create_table():
        AGE            INT     NOT NULL,
        ADDRESS        CHAR(50),
        SALARY         REAL);''')
-    print "Table created successfully";
+    print "Table created successfully"
     
 # Return table column id, column name, column type, is not null, default value, is PK
 def get_table_metadata(mDBname, mTable):
