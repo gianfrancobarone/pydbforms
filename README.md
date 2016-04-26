@@ -8,7 +8,7 @@ Currently working in read the data form sqlite (columns names and types etc.) an
 
 ####Usage 
 Sqlite:
-You must define a sqlite table with at least a Primary key with autoincrement and you are done.
+You must define a sqlite table with a Primary key (without autoincrement). 
 
 Python:
 In main file you must define the sqlite db file and the table(s) name.
