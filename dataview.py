@@ -1,5 +1,6 @@
 from Tkinter import *
 import tkMessageBox
+import ttk
 import dbutils
 
 buttons = {} 
@@ -81,12 +82,18 @@ def record_view(frame, mTable, mDBname, record=0):
     col_names = table[0]      
     rows = table[1] 
     pk = table[2]
+    fks = []
+    fks_values = []
+    for fk in dbutils.get_table_fk(mDBname, mTable):        
+        fks.append(fk[1])
+        fks_values = fk[3:]
+        print fks_values
     row_num = len(rows)          
     names = col_names
     entry = {}
     label = {}
     i = 0    
-    for name in names:
+    for name in names:        
         e = Entry(frame)
         e.grid(row=i, column=1, columnspan=3)
         entry[name] = e                

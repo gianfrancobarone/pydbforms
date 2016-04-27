@@ -41,10 +41,30 @@ def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
         for row in cur:
             data_number = data_number + 1
             data.append(row)
-        conn.close()                            
+        conn.close()                                 
         return col_names, data, pk_col
     except Exception, err:
         tkMessageBox.showerror("Error", err) 
+        
+# Return foreing table, column with fk, foreing column, values
+def get_table_fk(mDBname, mTable):
+    conn = sqlite3.connect(mDBname)      
+    #s = "PRAGMA foreign_keys = ON;" 
+    fk_cols = []    
+    cur = conn.cursor()    
+    s = "PRAGMA foreign_key_list('" + mTable + "');"
+    cur.execute(s)
+    data = cur.fetchall()
+    for d in data:
+        row = [str(d[2]),str(d[3]),str(d[4])]
+        s = 'select ' + row[2] + ' from ' + row[0]
+        cur.execute(s)
+        rows = cur.fetchall()
+        for r in rows:            
+            row.append(str(r))   
+        fk_cols.append(row)
+    conn.close()
+    return fk_cols
         
 def create(mDBname,tablename,cols,values):           
     conn = sqlite3.connect(mDBname)
@@ -108,6 +128,7 @@ def delete(mDBname, tablename,pkcol,value):
     
 # For test
 #get_table_metadata('testdb.db', 'Orders')
+get_table_fk('testdb.db', 'OrderDetails')
     
 
 

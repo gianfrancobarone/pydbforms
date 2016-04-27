@@ -3,7 +3,7 @@ import dataview
 
 # Attention, table names are case sensitive
 tablename = 'Customers'
-tablename2 = 'Orders'
+tablename2 = 'OrderDetails'
 DBname='testdb.db'
 
 root = Tk()
