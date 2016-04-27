@@ -39,7 +39,7 @@ def grid_view(frame, mTable, mDBname):
     entry = {}   
     label = {}
     global buttons 
-    buttons = {}   
+    buttons.clear() 
     button_num = 0
     global cols
     cols_num = 0
@@ -56,7 +56,7 @@ def grid_view(frame, mTable, mDBname):
     for row in rows:                        
         b = Button(frame, text= r+1)        
         b.grid(row=r+1, column=0, sticky = W, padx = 2)         
-        buttons[b] = 1 #button_num        
+        buttons[b] = button_num        
         button_num += 1
         b.bind( "<Button-1>", get_record)               
         c = 0      
@@ -68,20 +68,20 @@ def grid_view(frame, mTable, mDBname):
                 e.insert(0,'')
             else:
                 e.insert(0,rows[r][c]) 
-                e.configure(state='readonly')                      
+            e.configure(state='readonly')                      
             c = c + 1
         r = r + 1
          
-def record_view(frame, mTable, mDBname, record=0):          
-    table = dbutils.get_table_metadata(mDBname, mTable)
-    #col_number = table[0]    
-    col_names = table[0]
-    #col_extensions =table[2]    
+def record_view(frame, mTable, mDBname, record=0): 
+    global ad     
+    #if ad == 'DESC': ad = 'ASC'
+    #else: ad = 'DESC'   
+    table = dbutils.get_table_metadata(mDBname, mTable, sort, ad)         
+    #table = dbutils.get_table_metadata(mDBname, mTable)        
+    col_names = table[0]      
     rows = table[1] 
     pk = table[2]
-    row_num = len(rows)
-    #col_type = table[5] 
-    #fk_col = table[6]        
+    row_num = len(rows)          
     names = col_names
     entry = {}
     label = {}
@@ -213,12 +213,11 @@ def scrolled_view(main, dbname, tablename, t, record):
     
 def get_record(event):    
     ## free up memory 
-    #for item in root.grid_slaves():
-    #    item.destroy()       
+    for item in root.grid_slaves():
+        item.destroy()       
     global buttons    
-    record = buttons[event.widget]  
-    print record  
-    #scrolled_view(root,dbname_1, tablename_1,'r', record)
+    record = buttons[event.widget]       
+    scrolled_view(root,dbname_1, tablename_1,'r', record)
     
 def sort_by(event):
     ## free up memory 
