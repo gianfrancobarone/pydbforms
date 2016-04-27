@@ -1,9 +1,10 @@
 from Tkinter import *
 import dataview
 
-tablename = 'COMPANY'
-tablename2 = 'DEPARTMENTS'
-DBname='test.db'
+# Attention, table names are case sensitive
+tablename = 'Customers'
+tablename2 = 'Orders'
+DBname='testdb.db'
 
 root = Tk()
 root.title('Pyforms')

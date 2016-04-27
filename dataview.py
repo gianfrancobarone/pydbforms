@@ -9,6 +9,7 @@ record = 0
 ad = 'DESC'
 root = ''
 tablename_1 = ''
+dbname_1 = ''
 
 class AutoScrollbar(Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
@@ -37,7 +38,8 @@ def grid_view(frame, mTable, mDBname):
     rows = table[1]        
     entry = {}   
     label = {}
-    global buttons     
+    global buttons 
+    buttons = {}   
     button_num = 0
     global cols
     cols_num = 0
@@ -47,14 +49,14 @@ def grid_view(frame, mTable, mDBname):
         b.grid(row=0, column=l+1, sticky=W)
         cols[b] = cols_num
         cols_num += 1
-        label[name] = b
+        label[name] = b        
         l += 1   
         b.bind("<Button-1>", sort_by)              
     r = 0
     for row in rows:                        
-        b = Button(frame, text=r+1)        
+        b = Button(frame, text= r+1)        
         b.grid(row=r+1, column=0, sticky = W, padx = 2)         
-        buttons[b] = button_num
+        buttons[b] = 1 #button_num        
         button_num += 1
         b.bind( "<Button-1>", get_record)               
         c = 0      
@@ -65,19 +67,21 @@ def grid_view(frame, mTable, mDBname):
             if rows[r][c] == None:
                 e.insert(0,'')
             else:
-                e.insert(0,rows[r][c])                       
+                e.insert(0,rows[r][c]) 
+                e.configure(state='readonly')                      
             c = c + 1
         r = r + 1
          
-def record_view(frame, tablename, record=0):        
-    table = connection.Get_table(tablename,sort,ad) 
-    col_number = table[0]
-    col_names = table[1]
-    col_extensions =table[2]    
-    row_num = table[3]
-    rows = table[4] 
-    col_type = table[5] 
-    fk_col = table[6]        
+def record_view(frame, mTable, mDBname, record=0):          
+    table = dbutils.get_table_metadata(mDBname, mTable)
+    #col_number = table[0]    
+    col_names = table[0]
+    #col_extensions =table[2]    
+    rows = table[1] 
+    pk = table[2]
+    row_num = len(rows)
+    #col_type = table[5] 
+    #fk_col = table[6]        
     names = col_names
     entry = {}
     label = {}
@@ -89,36 +93,33 @@ def record_view(frame, tablename, record=0):
         if rows[record][i] == None: 
             e.insert(0,'')
         else:
-            e.insert(0,rows[record][i])        
+            e.insert(0,rows[record][i])
+            if (pk == name):
+                e.configure(state='readonly')        
         lb = Label(frame, text=name, pady = 5)
         lb.grid(row=i, column=0, sticky=W)
-        label[name] = lb
-        print name, fk_col
-        for fk in fk_col:
-            print fk
-        if name in fk_col:
-            b = Button(frame, text = "...", pady = 5)
-            b.grid(row=i,column=2, sticky=E)
-        ##b.bind( "<Button-1>", print i)   
+        label[name] = lb        
         i += 1
 
     def forward():        
         if record < row_num - 1: 
-            record_view(frame,tablename,1+record)
+            record_view(frame,mTable, mDBname,1+record)
         
     def back():
         if record > 0: 
-            record_view(frame,tablename,record-1)
+            record_view(frame,mTable, mDBname, record-1)
         
     def create():
         try:
             cols = []
             values = []                
             for name in names:
-                cols.append(name)
-                values.append(entry[name].get())            
-            connection.create(tablename,cols,values, col_type)   
-            tkMessageBox.showinfo("New record", "Record created")            
+                if (pk <> name):
+                    cols.append(name)
+                    values.append(entry[name].get())                       
+            dbutils.create(mDBname, mTable,cols,values)   
+            tkMessageBox.showinfo("New record", "Record created") 
+            scrolled_view(root,mDBname,mTable,'g',0)           
         except Exception, err:
             tkMessageBox.showerror("Error", err) 
         
@@ -137,23 +138,22 @@ def record_view(frame, tablename, record=0):
                 else:
                     old_values.append(rows[record][i]) 
                 i = i + 1              
-            connection.update(tablename, cols, new_values, old_values, col_type) 
-            tkMessageBox.showinfo("Update", "Record updated")            
+            dbutils.update(mDBname, mTable, cols, new_values, old_values) 
+            tkMessageBox.showinfo("Update", "Record updated")
+            scrolled_view(root,mDBname,mTable,'g',0)            
         except Exception, err:
             tkMessageBox.showerror("Error", err)       
         
         
     def delete():
-        try:
-            cols = []
-            values = []                
+        try:                            
             for name in names:
-                cols.append(name)
-                values.append(entry[name].get())            
-            connection.delete(tablename,cols,values, col_type)
-            forward()
-            back()
+                if (pk == name):
+                    pkcol = name
+                    value = entry[name].get()            
+            dbutils.delete(mDBname, mTable, pkcol, value)            
             tkMessageBox.showinfo("Delete record", "Record deleted")
+            scrolled_view(root,mDBname,mTable,'g',0)
         except Exception, err:
             tkMessageBox.showerror("Error", err)       
 
@@ -171,11 +171,13 @@ def record_view(frame, tablename, record=0):
     b_delete = Button(frame, text="Delete", command=delete, width = 8)
     b_delete.grid(row=i+2, column =3, sticky = N)   
     
-def scrolled_view(main, dbname, tablename, type, record):
+def scrolled_view(main, dbname, tablename, t, record):
     global root
     global tablename_1
+    global dbname_1
     root = main    
     tablename_1 = tablename
+    dbname_1 = dbname
     vscrollbar = AutoScrollbar(root)
     vscrollbar.grid(row=0, column=1, sticky=N+S)
     hscrollbar = AutoScrollbar(root, orient=HORIZONTAL)
@@ -200,8 +202,8 @@ def scrolled_view(main, dbname, tablename, type, record):
     frame.rowconfigure(1, weight=1)
     frame.columnconfigure(1, weight=1)
     
-    if type == 'r': record_view(frame,tablename, dbname, record)
-    if type == 'g': grid_view(frame,tablename, dbname)
+    if t == 'r': record_view(frame,tablename, dbname, record)
+    if t == 'g': grid_view(frame,tablename, dbname)
     
     canvas.create_window(0, 0, anchor=NW, window=frame)
 
@@ -211,11 +213,12 @@ def scrolled_view(main, dbname, tablename, type, record):
     
 def get_record(event):    
     ## free up memory 
-    for item in root.grid_slaves():
-        item.destroy()       
+    #for item in root.grid_slaves():
+    #    item.destroy()       
     global buttons    
-    record = buttons[event.widget]    
-    scrolled_view(root,tablename_1,'r', record)
+    record = buttons[event.widget]  
+    print record  
+    #scrolled_view(root,dbname_1, tablename_1,'r', record)
     
 def sort_by(event):
     ## free up memory 
@@ -224,7 +227,7 @@ def sort_by(event):
     global cols    
     global sort
     sort = cols[event.widget]              
-    scrolled_view(root,tablename_1,'g',sort)
+    scrolled_view(root,dbname_1, tablename_1,'g',sort)
     
 
 

@@ -20,7 +20,7 @@ def create_table():
     print "Table created successfully"
     
 # Pragma return data in this order: table column id, column name, column type, is not null, default value, is PK
-def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
+def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):    
     try:        
         conn = sqlite3.connect(mDBname)         
         s = "PRAGMA table_info('" + mTable + "');"
@@ -28,8 +28,12 @@ def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
         cur.execute(s)
         data = cur.fetchall()
         col_names = []
+        pk_col = ''
+        #col_types = []
         for d in data:
-            col_names.append(str(d[1]))     
+            col_names.append(str(d[1]))
+            if (str(d[5]) == '1'):
+                pk_col = str(d[1])                     
         cur.execute("select * from " + mTable + " order by " + col_names[sort] + ' ' + ad)    
         ## Get table data
         data = []
@@ -37,16 +41,73 @@ def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
         for row in cur:
             data_number = data_number + 1
             data.append(row)
-        conn.close()
-        #print col_names, data        
-        return col_names, data
+        conn.close()                            
+        return col_names, data, pk_col
     except Exception, err:
         tkMessageBox.showerror("Error", err) 
+        
+def create(mDBname,tablename,cols,values):           
+    conn = sqlite3.connect(mDBname)
+    curs = conn.cursor() 
+    # String construction   
+    string1 = "insert into " + tablename + " ("        
+    for col in cols:
+        string1 = string1 + col + ","           
+    string1 = string1[:-1] + ") "
+    i = 0    
+    string2 = "values ("        
+    for value in values:        
+        value = "'" + values[i] + "'"    
+        if values[i] == '': value = 'null'           
+        string2 = string2 + value + ","
+        i = i + 1
+    string2 = string2[:-1] + ")" 
+    string = string1 + string2 + ';'
+    print string                    
+    curs.execute(string)        
+    conn.commit()  
+    curs.close()
+    conn.close()
+    
+def update(mDBname, tablename, cols, new_values, old_values):    
+    conn = sqlite3.connect(mDBname)
+    curs = conn.cursor() 
+    # String construction       
+    string = "update " + tablename + " set"
+    for i in range(0,len(cols)):
+        string = string + " " + cols[i] + " = " 
+        value = "'" + new_values[i] + "'"    
+        if new_values[i] == '': value = 'null'  
+        string = string + value + ","
+    string = string[:-1] + " where "         
+    for i in range(0,len(cols)):
+        string = string + " " + cols[i] + " = " 
+        value = "'" + str(old_values[i]) + "'"    
+        if old_values[i] == '': 
+            string = string[:-2]
+            value = "is null"  
+        string = string + value + " AND "              
+    string = string[:-4] + ';'    
+    curs.execute(string)    
+    conn.commit()  
+    curs.close()
+    conn.close()
+    
+    
+def delete(mDBname, tablename,pkcol,value):    
+    conn = sqlite3.connect(mDBname)
+    curs = conn.cursor() 
+    string = 'delete from ' + tablename + ' where ' + str(pkcol) + ' = ' + str(value) + ';'    
+    curs.execute(string)    
+    conn.commit()  
+    curs.close()
+    conn.close()
+    conn.close
          
     
     
 # For test
-#get_table_metadata('test.db', 'COMPANY')
+#get_table_metadata('testdb.db', 'Orders')
     
 
 
