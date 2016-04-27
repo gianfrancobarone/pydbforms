@@ -48,23 +48,26 @@ def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
         
 # Return foreing table, column with fk, foreing column, values
 def get_table_fk(mDBname, mTable):
-    conn = sqlite3.connect(mDBname)      
+    conn = sqlite3.connect(mDBname) 
+    conn.text_factory = str     
     #s = "PRAGMA foreign_keys = ON;" 
-    fk_cols = []    
-    cur = conn.cursor()    
+    fk_cols = []  
+    fk_values = []      
+    cur = conn.cursor()        
     s = "PRAGMA foreign_key_list('" + mTable + "');"
     cur.execute(s)
-    data = cur.fetchall()
+    data = cur.fetchall()    
     for d in data:
-        row = [str(d[2]),str(d[3]),str(d[4])]
-        s = 'select ' + row[2] + ' from ' + row[0]
+        f_table = str(d[2])
+        f_column = str(d[4])
+        column_with_fk = str(d[3])          
+        s = "select " + f_column + " from " + f_table + " order by " + f_column               
         cur.execute(s)
-        rows = cur.fetchall()
-        for r in rows:            
-            row.append(str(r))   
-        fk_cols.append(row)
+        values = cur.fetchall()           
+        fk_values.append([r[0] for r in values])               
+        fk_cols.append(column_with_fk)
     conn.close()
-    return fk_cols
+    return fk_cols, fk_values
         
 def create(mDBname,tablename,cols,values):           
     conn = sqlite3.connect(mDBname)
@@ -82,8 +85,7 @@ def create(mDBname,tablename,cols,values):
         string2 = string2 + value + ","
         i = i + 1
     string2 = string2[:-1] + ")" 
-    string = string1 + string2 + ';'
-    print string                    
+    string = string1 + string2 + ';'                       
     curs.execute(string)        
     conn.commit()  
     curs.close()
@@ -128,7 +130,10 @@ def delete(mDBname, tablename,pkcol,value):
     
 # For test
 #get_table_metadata('testdb.db', 'Orders')
-get_table_fk('testdb.db', 'OrderDetails')
+#print get_table_fk('testdb.db', 'OrderDetails')
+
+    
+  
     
 
 

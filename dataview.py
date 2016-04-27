@@ -81,28 +81,33 @@ def record_view(frame, mTable, mDBname, record=0):
     #table = dbutils.get_table_metadata(mDBname, mTable)        
     col_names = table[0]      
     rows = table[1] 
-    pk = table[2]
-    fks = []
-    fks_values = []
-    for fk in dbutils.get_table_fk(mDBname, mTable):        
-        fks.append(fk[1])
-        fks_values = fk[3:]
-        print fks_values
+    pk = table[2]   
     row_num = len(rows)          
     names = col_names
     entry = {}
+    box = {}
     label = {}
-    i = 0    
-    for name in names:        
-        e = Entry(frame)
-        e.grid(row=i, column=1, columnspan=3)
-        entry[name] = e                
-        if rows[record][i] == None: 
-            e.insert(0,'')
-        else:
-            e.insert(0,rows[record][i])
-            if (pk == name):
-                e.configure(state='readonly')        
+    i = 0   
+    fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)    
+    for name in names:
+        try:
+            idx = fk_columns.index(name)
+            value = StringVar()
+            e = ttk.Combobox(frame, textvariable=value, state='readonly')
+            e['values'] = fk_values[idx]
+            e.current(0)
+            e.grid(row=i, column=1, columnspan=3)
+            box[name] = e
+        except:    
+            e = Entry(frame)
+            e.grid(row=i, column=1, columnspan=3)
+            entry[name] = e                
+            if rows[record][i] == None: 
+                e.insert(0,'')
+            else:
+                e.insert(0,rows[record][i])
+                if (pk == name):
+                    e.configure(state='readonly')        
         lb = Label(frame, text=name, pady = 5)
         lb.grid(row=i, column=0, sticky=W)
         label[name] = lb        
@@ -117,18 +122,22 @@ def record_view(frame, mTable, mDBname, record=0):
             record_view(frame,mTable, mDBname, record-1)
         
     def create():
-        try:
+        #try:
             cols = []
             values = []                
             for name in names:
                 if (pk <> name):
-                    cols.append(name)
-                    values.append(entry[name].get())                       
+                    if (name in fk_columns):
+                        cols.append(name)
+                        values.append(box[name].get())
+                    else:                        
+                        cols.append(name)
+                        values.append(entry[name].get())                       
             dbutils.create(mDBname, mTable,cols,values)   
             tkMessageBox.showinfo("New record", "Record created") 
             scrolled_view(root,mDBname,mTable,'g',0)           
-        except Exception, err:
-            tkMessageBox.showerror("Error", err) 
+        #except Exception, err:
+            #tkMessageBox.showerror("Error", err) 
         
         
     def update():
@@ -138,8 +147,12 @@ def record_view(frame, mTable, mDBname, record=0):
             old_values = []
             i = 0
             for name in names:
-                cols.append(name)
-                new_values.append(entry[name].get())
+                if (name in fk_columns):
+                    cols.append(name)
+                    new_values.append(box[name].get())
+                else:                        
+                    cols.append(name)
+                    new_values.append(entry[name].get())                
                 if rows[record][i] == None:
                     old_values.append('')
                 else:
