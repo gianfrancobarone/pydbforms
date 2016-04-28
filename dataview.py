@@ -1,5 +1,6 @@
 from Tkinter import *
 import tkMessageBox
+import tkFileDialog
 import ttk
 import dbutils
 
@@ -13,6 +14,7 @@ tablename_1 = ''
 dbname_1 = ''
 searchbox = {}
 search = ''
+tabledata = []
 
 class AutoScrollbar(Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
@@ -40,7 +42,8 @@ def grid_view(frame, mTable, mDBname):
     button_num = 0
     global cols
     global searchbox  
-    global search       
+    global search
+    global tabledata           
     cols_num = 0
     l = 0
     space = Label(frame, text='', pady = 5)
@@ -53,7 +56,10 @@ def grid_view(frame, mTable, mDBname):
     b.bind( "<Button-1>", filter_records)
     e = Entry(frame)
     e.grid(row=1, column=l+3, sticky=W)
-    searchbox['search'] = e        
+    searchbox['search'] = e  
+    b = Button(frame, text='CSV', bd=1)
+    b.grid(row=1, column=l+4, sticky=W)
+    b.bind( "<Button-1>", make_CVS)      
     space = Label(frame, text='', pady = 5)
     space.grid(row=2, column = 0, sticky= W) 
     for name in col_names:
@@ -69,7 +75,8 @@ def grid_view(frame, mTable, mDBname):
     rs = 4 
     filtered_rows = []      
     for rw in rows:
-        if (search in rw) or (len(search) < 1): filtered_rows.append(rw)    
+        if (search in rw) or (len(search) < 1): filtered_rows.append(rw)
+    tabledata = filtered_rows    
     for row in filtered_rows:                               
         b = Button(frame, text= r+1)        
         b.grid(row=r+rs, column=0, sticky = W, padx = 2)         
@@ -294,6 +301,19 @@ def filter_records(event):
         item.destroy() 
     ### Recreate grid with filter if exist               
     scrolled_view(root,dbname_1, tablename_1,'g',0)
+    
+def make_CVS(event):
+    f = tkFileDialog.asksaveasfile(mode='w', defaultextension=".csv")
+    if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
+        return 
+    cvs = ''
+    for row in tabledata:
+        for col in row:
+            cvs = cvs + str(col) + ','
+        cvs=cvs[:-1] + '\n'    
+    f.write(cvs)
+    f.close() # `()` was missing.
+    
     
 
 
