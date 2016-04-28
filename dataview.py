@@ -47,28 +47,24 @@ def grid_view(master_frame, mTable, mDBname):
     cols_num = 0
     l = 0    
     master_frame.grid(row=0,column = 0, sticky = S) 
-    button_frame = Frame(master_frame) 
-    frame = Frame(master_frame)
+    button_frame = Frame(master_frame, bg = 'dark slate gray') 
+    frame = Frame(master_frame, bg = 'dark slate gray')
     button_frame.grid(row=0,column=0, stick = NW) 
-    frame.grid(row=1,column=0, stick = N)  
-    space = Label(button_frame, text='', pady = 5)
-    space.grid(row=0, column = 0, sticky= W) 
-    b = Button(button_frame, text='Add Record', bd=1)
-    b.grid(row=1, column=l+1, sticky=W, padx=5)
+    frame.grid(row=1,column=0, stick = N)    
+    b = Button(button_frame, text='Add Record', bd=1, bg = 'dark slate gray', fg = 'white')
+    b.grid(row=1, column=l+1, sticky=W, padx=5, pady=15)
     b.bind( "<Button-1>", new_record)    
-    b = Button(button_frame, text='Search', bd=1)
-    b.grid(row=1, column=l+4, sticky=W , padx=(5,0))
+    b = Button(button_frame, text='Search', bd=1, bg = 'dark slate gray', fg = 'white')
+    b.grid(row=1, column=l+4, sticky=W , padx=(5,2))
     b.bind( "<Button-1>", filter_records)
-    e = Entry(button_frame)
+    e = Entry(button_frame, bg = 'black', fg = 'white', insertbackground='white')
     e.grid(row=1, column=l+5, sticky=W)
     searchbox['search'] = e  
-    b = Button(button_frame, text='Export to CSV', bd=1)
+    b = Button(button_frame, text='Export to CSV', bd=1, bg = 'dark slate gray', fg = 'white')
     b.grid(row=1, column=l+3, sticky=W, padx=5)
-    b.bind( "<Button-1>", make_CVS)      
-    space = Label(frame, text='', pady = 5)
-    space.grid(row=2, column = 0, sticky= W) 
+    b.bind( "<Button-1>", make_CVS)     
     for name in col_names:
-        b = Button(frame, text=name, bd=0)
+        b = Button(frame, text=name, bd=0,  bg = 'dark slate gray', fg = 'white', relief='raised')
         b.grid(row=3, column=l+1, sticky=W)
         cols[b] = cols_num
         cols_num += 1
@@ -89,15 +85,15 @@ def grid_view(master_frame, mTable, mDBname):
                     break                                  
     tabledata = filtered_rows                   
     for row in filtered_rows:                               
-        b = Button(frame, text= r+1)        
+        b = Button(frame, text= r+1, bg = 'dark slate gray', fg = 'white')        
         b.grid(row=r+rs, column=0, sticky = W, padx = 2)         
         buttons[b] = button_num        
         button_num += 1
         b.bind( "<Button-1>", get_record)               
         c = 0      
         for col in row:          
-            e = Entry(frame)
-            e.grid(row=r+rs, column=c+1)
+            e = Entry(frame, bg='black', fg='white', readonlybackground='black')
+            e.grid(row=r+rs, column=c+1, padx=2)
             entry[row] = e
             if filtered_rows[r][c] == None:
                 e.insert(0,'')
@@ -122,15 +118,15 @@ def record_view(frame, mTable, mDBname, record=0):
     box = {}
     label = {}
     i = 0   
+    value = StringVar()
     fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)    
     for name in names:
         try:
-            idx = fk_columns.index(name)
-            value = StringVar()
+            idx = fk_columns.index(name)            
             e = ttk.Combobox(frame, textvariable=value, state='readonly')
             e['values'] = fk_values[idx]
-            e.current(0)
-            e.grid(row=i, column=2, columnspan=3, sticky=W)
+            e.current(0)            
+            e.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
             box[name] = e
         except:                    
             e = Entry(frame)
@@ -142,8 +138,8 @@ def record_view(frame, mTable, mDBname, record=0):
                 e.insert(0,rows[record][i])
             if (pk == name):
                 e.configure(state='readonly')        
-        lb = Label(frame, text=name, pady = 5)
-        lb.grid(row=i, column=0, sticky=W)
+        lb = Label(frame, text=name, bg = 'dark slate gray', fg = 'white')
+        lb.grid(row=i, column=0, sticky=W, pady = 5, padx = 5)
         label[name] = lb        
         i += 1
 
@@ -211,23 +207,19 @@ def record_view(frame, mTable, mDBname, record=0):
         except Exception, err:
             tkMessageBox.showerror("Error", err)   
             
-    if (record == -1):
-        space = Label(frame, text='', pady = 5)
-        space.grid(row=i+1, column = 0, sticky= W)   
+    if (record == -1):           
         b_create = Button(frame, text="Save", command=create, width = 8)
-        b_create.grid(row=i+2, column =1, sticky = N)
+        b_create.grid(row=i+2, column =1, sticky = N, pady=20)       
         
     else:
         b_avanti = Button(frame, text="->", command=forward)
         b_avanti.grid(row=i, column = 3, sticky = W)
         b_indietro = Button(frame, text="<-", command=back)
-        b_indietro.grid(row=i, column = 2, sticky = E)    
-        space = Label(frame, text='', pady = 5)
-        space.grid(row=i+1, column = 0, sticky= W)       
+        b_indietro.grid(row=i, column = 2, sticky = E)              
         b_update = Button(frame, text="Update", command=update, width = 8)
-        b_update.grid(row=i+2, column =2, sticky = N)
+        b_update.grid(row=i+2, column =2, sticky = N, pady=20)
         b_delete = Button(frame, text="Delete", command=delete, width = 8)
-        b_delete.grid(row=i+2, column =3, sticky = N)  
+        b_delete.grid(row=i+2, column =3, sticky = N, pady=20)       
         
 def scrolled_view(main, dbname, tablename, t, record):
     
@@ -245,7 +237,7 @@ def scrolled_view(main, dbname, tablename, t, record):
     hscrollbar = AutoScrollbar(root, orient=HORIZONTAL)
     hscrollbar.grid(row=1, column=0, sticky=E+W)
     
-    canvas = Canvas(root,
+    canvas = Canvas(root, bg = 'dark slate gray', 
                 yscrollcommand=vscrollbar.set,
                 xscrollcommand=hscrollbar.set)
     canvas.grid(row=0, column=0, sticky=N+S+E+W)
@@ -262,7 +254,7 @@ def scrolled_view(main, dbname, tablename, t, record):
     #
     # create canvas contents
 
-    frame = Frame(canvas)
+    frame = Frame(canvas, bg = 'dark slate gray')
     frame.rowconfigure(1, weight=1)
     frame.columnconfigure(1, weight=1)
     
@@ -288,7 +280,6 @@ def new_record(event):
     for item in root.grid_slaves():
         item.destroy()          
     scrolled_view(root,dbname_1, tablename_1,'r', -1)
-    
     
 def sort_by(event):
     ## free up memory 
