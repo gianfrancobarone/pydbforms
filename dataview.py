@@ -117,12 +117,12 @@ def record_view(frame, mTable, mDBname, record=0):
     entry = {}
     box = {}
     label = {}
-    i = 0   
-    value = StringVar()
+    i = 0     
     fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)    
     for name in names:
-        try:
-            idx = fk_columns.index(name)            
+        try:            
+            idx = fk_columns.index(name)  
+            value = StringVar()          
             e = ttk.Combobox(frame, textvariable=value, state='readonly')
             e['values'] = fk_values[idx]
             e.current(0)            
