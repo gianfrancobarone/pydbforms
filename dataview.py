@@ -28,9 +28,9 @@ class AutoScrollbar(Scrollbar):
         raise TclError, "cannot use place with this widget"
     
 def grid_view(frame, mTable, mDBname):     
-    global ad     
-    if ad == 'DESC': ad = 'ASC'
-    else: ad = 'DESC'   
+    #global ad     
+    #if ad == 'DESC': ad = 'ASC'
+    #else: ad = 'DESC'   
     table = dbutils.get_table_metadata(mDBname, mTable, sort, ad)     
     #col_number = table[0]
     col_names = table[0]
@@ -96,7 +96,7 @@ def record_view(frame, mTable, mDBname, record=0):
             e = ttk.Combobox(frame, textvariable=value, state='readonly')
             e['values'] = fk_values[idx]
             e.current(0)
-            e.grid(row=i, column=1, columnspan=3)
+            e.grid(row=i, column=2, columnspan=3, sticky=W)
             box[name] = e
         except:    
             e = Entry(frame)
@@ -122,7 +122,7 @@ def record_view(frame, mTable, mDBname, record=0):
             record_view(frame,mTable, mDBname, record-1)
         
     def create():
-        #try:
+        try:
             cols = []
             values = []                
             for name in names:
@@ -132,12 +132,12 @@ def record_view(frame, mTable, mDBname, record=0):
                         values.append(box[name].get())
                     else:                        
                         cols.append(name)
-                        values.append(entry[name].get())                       
+                        values.append(entry[name].get())                                    
             dbutils.create(mDBname, mTable,cols,values)   
             tkMessageBox.showinfo("New record", "Record created") 
             scrolled_view(root,mDBname,mTable,'g',0)           
-        #except Exception, err:
-            #tkMessageBox.showerror("Error", err) 
+        except Exception, err:
+            tkMessageBox.showerror("Error", err) 
         
         
     def update():
@@ -192,6 +192,10 @@ def record_view(frame, mTable, mDBname, record=0):
     b_delete.grid(row=i+2, column =3, sticky = N)   
     
 def scrolled_view(main, dbname, tablename, t, record):
+    
+    def on_mousewheel(event):
+        canvas.yview_scroll(-1*(event.delta/120), "units")
+        
     global root
     global tablename_1
     global dbname_1
@@ -207,6 +211,8 @@ def scrolled_view(main, dbname, tablename, t, record):
                 yscrollcommand=vscrollbar.set,
                 xscrollcommand=hscrollbar.set)
     canvas.grid(row=0, column=0, sticky=N+S+E+W)
+    
+    canvas.bind_all("<MouseWheel>", on_mousewheel)   
 
     vscrollbar.config(command=canvas.yview)
     hscrollbar.config(command=canvas.xview)
@@ -245,7 +251,10 @@ def sort_by(event):
         item.destroy() 
     global cols    
     global sort
-    sort = cols[event.widget]              
+    sort = cols[event.widget]  
+    global ad     
+    if ad == 'DESC': ad = 'ASC'
+    else: ad = 'DESC'             
     scrolled_view(root,dbname_1, tablename_1,'g',sort)
     
 
