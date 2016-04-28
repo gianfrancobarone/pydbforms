@@ -31,7 +31,7 @@ class AutoScrollbar(Scrollbar):
     def place(self, **kw):
         raise TclError, "cannot use place with this widget"
     
-def grid_view(frame, mTable, mDBname):        
+def grid_view(frame, mTable, mDBname):       
     table = dbutils.get_table_metadata(mDBname, mTable, sort, ad)   
     col_names = table[0]   
     rows = table[1]        
@@ -45,20 +45,21 @@ def grid_view(frame, mTable, mDBname):
     global search
     global tabledata           
     cols_num = 0
-    l = 0
+    l = 0    
+    frame.grid(row=1,column = 0, sticky = S)    
     space = Label(frame, text='', pady = 5)
     space.grid(row=0, column = 0, sticky= W) 
     b = Button(frame, text='Add Record', bd=1)
     b.grid(row=1, column=l+1, sticky=W)
     b.bind( "<Button-1>", new_record)
     b = Button(frame, text='Search', bd=1)
-    b.grid(row=1, column=l+2, sticky=W)
+    b.grid(row=1, column=l+4, sticky=W)
     b.bind( "<Button-1>", filter_records)
     e = Entry(frame)
     e.grid(row=1, column=l+3, sticky=W)
     searchbox['search'] = e  
-    b = Button(frame, text='CSV', bd=1)
-    b.grid(row=1, column=l+4, sticky=W)
+    b = Button(frame, text='Export to CSV', bd=1)
+    b.grid(row=1, column=l+2, sticky=W)
     b.bind( "<Button-1>", make_CVS)      
     space = Label(frame, text='', pady = 5)
     space.grid(row=2, column = 0, sticky= W) 
