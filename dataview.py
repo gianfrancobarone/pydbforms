@@ -74,10 +74,16 @@ def grid_view(frame, mTable, mDBname):
     r = 0  
     #Rows start rs
     rs = 4 
-    filtered_rows = []      
-    for rw in rows:
-        if (search in rw) or (len(search) < 1): filtered_rows.append(rw)
-    tabledata = filtered_rows    
+    filtered_rows = []  
+    if len(search) < 1:
+        filtered_rows = rows
+    else:
+        for rw in rows:           
+            for item in rw:
+                if search.lower() in (str(item).lower()):                    
+                    filtered_rows.append(rw)  
+                    break                                  
+    tabledata = filtered_rows                   
     for row in filtered_rows:                               
         b = Button(frame, text= r+1)        
         b.grid(row=r+rs, column=0, sticky = W, padx = 2)         
