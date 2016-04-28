@@ -8,6 +8,7 @@ DBname='testdb.db'
 
 root = Tk()
 root.title('Pyforms')
+root.configure(background='dark slate gray')
 menubar = Menu(root)   
 
 # create a pulldown menu, and add it to the menu bar
