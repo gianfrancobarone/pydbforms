@@ -9,7 +9,7 @@ Basically it's still a prototype but is working. You can use it to look at the c
 ####Getting started!
 Download it from the repository and make a first test by simply modify the main.py file: put your sqlite3 database in the same directory change the database name variable 'Dbname' and table variable 'tablename' (and 'tablename2' if you want) and you are ready. Adding more table is very easy just follow the code...
 
-Pydbforms is also smart enough to read the fk constraint related table so basically the input is a combobox if the column has a foreign key (but currently null are allowed so if you don't want to raise an error the fk column must be nullable).  
+Pydbforms is also smart enough to read the fk constraint related table so basically the input is a combobox if the column has a foreign key (but currently null are not allowed so the first value from the fk column be will be selected).  
 
 
 
