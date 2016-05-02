@@ -12,14 +12,21 @@ Download it from the repository and make a first test by simply modify the main.
 Pydbforms is also smart enough to read the fk constraint related table so basically the input is a combobox if the column has a foreign key (but currently null are not allowed so the first value from the fk column be will be selected).  
 
 ####ToDo:
-1) Implent option to make table editable or not
-2) Refactor files structure
-3) Make an exe file and let user to use the exe on windows using a definition file GUI and table
-4) Add date with calendar picker
-5) Reporting features (graphs, hystograms etc.)
-6) Sql editor/Advanced mode
-7) Excel importer/exporter
-8) Formula creator (create optional columns based on formula defined in a text file, like sums, mean, range etc.)
+1) Implent option to make table editable or not.
+
+2) Refactor files structure.
+
+3) Make an exe file and let user to use the exe on windows using a definition file GUI and table.
+
+4) Add date with calendar picker.
+
+5) Reporting features (graphs, hystograms etc.).
+
+6) Sql editor/Advanced mode.
+
+7) Excel importer/exporter.
+
+8) Formula creator (create optional columns based on formula defined in a text file, like sums, mean, range etc.).
 
 
 
