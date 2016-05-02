@@ -1,7 +1,7 @@
 from Tkinter import *
 from pydbforms import dataview
 
-# Attention, table names are case sensitive
+# Note: table names are case sensitive
 tablename = 'Customers'
 tablename2 = 'OrderDetails'
 DBname='testdb.db'
