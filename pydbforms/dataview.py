@@ -64,7 +64,7 @@ def grid_view(master_frame, mTable, mDBname):
     b = Button(button_frame, text='Search', bd=1, bg = 'dark slate gray', fg = 'white')
     b.grid(row=1, column=l+4, sticky=W , padx=(5,2), pady=15)
     b.bind( "<Button-1>", filter_records)
-    e = Entry(button_frame, bg = 'black', fg = 'white', insertbackground='white')
+    e = Entry(button_frame, bg = 'white', fg = 'black', insertbackground='black')
     e.grid(row=1, column=l+5, sticky=W)
     searchbox['search'] = e  
     b = Button(button_frame, text='Export to CSV', bd=1, bg = 'dark slate gray', fg = 'white')
@@ -90,8 +90,10 @@ def grid_view(master_frame, mTable, mDBname):
                 if search.lower() in (str(item).lower()):                    
                     filtered_rows.append(rw)  
                     break                                  
-    tabledata = filtered_rows                   
-    for row in filtered_rows:                               
+    tabledata = filtered_rows                       
+    for row in filtered_rows:
+        bg_color = 'gray10'
+        if r & 1: bg_color = 'gray14'                       
         b = Button(frame, text= r+1, bg = 'dark slate gray', fg = 'white')        
         b.grid(row=r+rs, column=0, sticky = W, padx = 2)         
         buttons[b] = button_num        
@@ -99,7 +101,7 @@ def grid_view(master_frame, mTable, mDBname):
         b.bind( "<Button-1>", get_record)               
         c = 0      
         for col in row:          
-            e = Entry(frame, bg='black', fg='white', readonlybackground='black')
+            e = Entry(frame, bg=bg_color, fg='white', readonlybackground=bg_color)
             e.grid(row=r+rs, column=c+1, padx=2)
             entry[row] = e
             if filtered_rows[r][c] == None:
@@ -145,7 +147,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 b.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
                 box[name] = b                                                                                                                   
             except:                    
-                e = Entry(frame)
+                e = Entry(frame, bg = 'white', fg = 'black', insertbackground='black', readonlybackground='gray55')
                 e.grid(row=i, column=1, columnspan=3)
                 entry[name] = e                
                 if (rows[record][i] == None) or (record == -1): 
@@ -155,7 +157,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 if (pk == name):
                     e.configure(state='readonly')
         else:
-            e = Entry(frame)
+            e = Entry(frame, bg = 'black', fg = 'white', insertbackground='white', readonlybackground='gray19')
             e.grid(row=i, column=1, columnspan=3)
             entry[name] = e                
             if (rows[record][i] == None) or (record == -1): 
