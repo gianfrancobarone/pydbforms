@@ -14,7 +14,7 @@ Pydbforms is also smart enough to read the fk constraint related table so basica
 ####ToDo:
 1) Implent option to make table editable or not.
 
-2) ~~Refactor files structure.~~
+2) Refactor files structure.
 
 3) Make an exe file and let user to use the exe on windows using a definition file GUI and table.
 
