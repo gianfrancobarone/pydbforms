@@ -15,6 +15,8 @@ dbname_1 = ''
 searchbox = {}
 search = ''
 tabledata = []
+# Must be global or will be garbage collected before value is set in the combobox
+strValues = {}
 
 class AutoScrollbar(Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
@@ -37,13 +39,15 @@ def grid_view(master_frame, mTable, mDBname):
     rows = table[1]        
     entry = {}   
     label = {}
-    global buttons 
-    buttons.clear() 
-    button_num = 0
+    global buttons   
     global cols
     global searchbox  
     global search
-    global tabledata           
+    global tabledata
+    buttons.clear() 
+    cols.clear()
+    searchbox.clear()   
+    button_num = 0           
     cols_num = 0
     l = 0    
     master_frame.grid(row=0,column = 0, sticky = S) 
@@ -114,20 +118,27 @@ def record_view(frame, mTable, mDBname, record=0):
     pk = table[2]   
     row_num = len(rows)          
     names = col_names
-    entry = {}
+    entry = {}    
     box = {}
     label = {}
-    i = 0     
-    fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)    
-    for name in names:
-        try:            
-            idx = fk_columns.index(name)  
-            value = StringVar()          
-            e = ttk.Combobox(frame, textvariable=value, state='readonly')
-            e['values'] = fk_values[idx]
-            e.current(0)            
-            e.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
-            box[name] = e
+    global strValues
+    # Free up memory as set it global
+    strValues.clear()
+    i = 0  
+    fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)
+    for fk_col in fk_columns:        
+        strValues[fk_col] = StringVar(frame)     
+    for name in names:        
+        try:                       
+            idx = fk_columns.index(name)                         
+            b = ttk.Combobox(frame, textvariable= strValues[name], state='readonly')
+            b['values'] = fk_values[idx]
+            if (rows[record][i] == None) or (record == -1): 
+                b.current(0)
+            else:
+                b.set(rows[record][i])                               
+            b.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
+            box[name] = b                                                                                                                   
         except:                    
             e = Entry(frame)
             e.grid(row=i, column=1, columnspan=3)
@@ -137,11 +148,11 @@ def record_view(frame, mTable, mDBname, record=0):
             else:
                 e.insert(0,rows[record][i])
             if (pk == name):
-                e.configure(state='readonly')        
+                e.configure(state='readonly')                                               
         lb = Label(frame, text=name, bg = 'dark slate gray', fg = 'white')
         lb.grid(row=i, column=0, sticky=W, pady = 5, padx = 5)
         label[name] = lb        
-        i += 1
+        i += 1       
 
     def forward():        
         if record < row_num - 1: 
