@@ -17,6 +17,7 @@ search = ''
 tabledata = []
 # Must be global or will be garbage collected before value is set in the combobox
 strValues = {}
+editable = True
 
 class AutoScrollbar(Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
@@ -44,6 +45,7 @@ def grid_view(master_frame, mTable, mDBname):
     global searchbox  
     global search
     global tabledata
+    global editable
     buttons.clear() 
     cols.clear()
     searchbox.clear()   
@@ -54,12 +56,13 @@ def grid_view(master_frame, mTable, mDBname):
     button_frame = Frame(master_frame, bg = 'dark slate gray') 
     frame = Frame(master_frame, bg = 'dark slate gray')
     button_frame.grid(row=0,column=0, stick = NW) 
-    frame.grid(row=1,column=0, stick = N)    
-    b = Button(button_frame, text='Add Record', bd=1, bg = 'dark slate gray', fg = 'white')
-    b.grid(row=1, column=l+1, sticky=W, padx=5, pady=15)
-    b.bind( "<Button-1>", new_record)    
+    frame.grid(row=1,column=0, stick = N) 
+    if editable:   
+        b = Button(button_frame, text='Add Record', bd=1, bg = 'dark slate gray', fg = 'white')
+        b.grid(row=1, column=l+1, sticky=W, padx=5, pady=15)
+        b.bind( "<Button-1>", new_record)    
     b = Button(button_frame, text='Search', bd=1, bg = 'dark slate gray', fg = 'white')
-    b.grid(row=1, column=l+4, sticky=W , padx=(5,2))
+    b.grid(row=1, column=l+4, sticky=W , padx=(5,2), pady=15)
     b.bind( "<Button-1>", filter_records)
     e = Entry(button_frame, bg = 'black', fg = 'white', insertbackground='white')
     e.grid(row=1, column=l+5, sticky=W)
@@ -108,7 +111,8 @@ def grid_view(master_frame, mTable, mDBname):
         r = r + 1
         
 def record_view(frame, mTable, mDBname, record=0): 
-    global ad     
+    global ad   
+    global editable  
     #if ad == 'DESC': ad = 'ASC'
     #else: ad = 'DESC'   
     table = dbutils.get_table_metadata(mDBname, mTable, sort, ad)         
@@ -124,22 +128,33 @@ def record_view(frame, mTable, mDBname, record=0):
     global strValues
     # Free up memory as set it global
     strValues.clear()
-    i = 0  
+    i = 0    
     fk_columns, fk_values = dbutils.get_table_fk(mDBname, mTable)
     for fk_col in fk_columns:        
-        strValues[fk_col] = StringVar(frame)     
-    for name in names:        
-        try:                       
-            idx = fk_columns.index(name)                         
-            b = ttk.Combobox(frame, textvariable= strValues[name], state='readonly')
-            b['values'] = fk_values[idx]
-            if (rows[record][i] == None) or (record == -1): 
-                b.current(0)
-            else:
-                b.set(rows[record][i])                               
-            b.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
-            box[name] = b                                                                                                                   
-        except:                    
+        strValues[fk_col] = StringVar(frame)         
+    for name in names:
+        if editable:        
+            try:                       
+                idx = fk_columns.index(name)                         
+                b = ttk.Combobox(frame, textvariable= strValues[name], state='readonly')
+                b['values'] = fk_values[idx]
+                if (rows[record][i] == None) or (record == -1): 
+                    b.current(0)
+                else:
+                    b.set(rows[record][i])                               
+                b.grid(row=i, column=2, columnspan=3, sticky=W, padx=25)
+                box[name] = b                                                                                                                   
+            except:                    
+                e = Entry(frame)
+                e.grid(row=i, column=1, columnspan=3)
+                entry[name] = e                
+                if (rows[record][i] == None) or (record == -1): 
+                    e.insert(0,'')
+                else:
+                    e.insert(0,rows[record][i])
+                if (pk == name):
+                    e.configure(state='readonly')
+        else:
             e = Entry(frame)
             e.grid(row=i, column=1, columnspan=3)
             entry[name] = e                
@@ -147,8 +162,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 e.insert(0,'')
             else:
                 e.insert(0,rows[record][i])
-            if (pk == name):
-                e.configure(state='readonly')                                               
+            e.configure(state='readonly')                                               
         lb = Label(frame, text=name, bg = 'dark slate gray', fg = 'white')
         lb.grid(row=i, column=0, sticky=W, pady = 5, padx = 5)
         label[name] = lb        
@@ -176,7 +190,7 @@ def record_view(frame, mTable, mDBname, record=0):
                         values.append(entry[name].get())                                    
             dbutils.create(mDBname, mTable,cols,values)   
             tkMessageBox.showinfo("New record", "Record created") 
-            scrolled_view(root,mDBname,mTable,'g',0)           
+            scrolled_view(root,mDBname,mTable,'g',0, editable)           
         except Exception, err:
             tkMessageBox.showerror("Error", err) 
         
@@ -201,7 +215,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 i = i + 1              
             dbutils.update(mDBname, mTable, cols, new_values, old_values) 
             tkMessageBox.showinfo("Update", "Record updated")
-            scrolled_view(root,mDBname,mTable,'g',0)            
+            scrolled_view(root,mDBname,mTable,'g',0, editable)            
         except Exception, err:
             tkMessageBox.showerror("Error", err)       
         
@@ -214,25 +228,26 @@ def record_view(frame, mTable, mDBname, record=0):
                     value = entry[name].get()            
             dbutils.delete(mDBname, mTable, pkcol, value)            
             tkMessageBox.showinfo("Delete record", "Record deleted")
-            scrolled_view(root,mDBname,mTable,'g',0)
+            scrolled_view(root,mDBname,mTable,'g',0, editable)
         except Exception, err:
             tkMessageBox.showerror("Error", err)   
             
-    if (record == -1):           
-        b_create = Button(frame, text="Save", command=create, width = 8)
-        b_create.grid(row=i+2, column =1, sticky = N, pady=20)       
+    if editable:
+        if (record == -1):           
+            b_create = Button(frame, text="Save", command=create, width = 8)
+            b_create.grid(row=i+2, column =1, sticky = N, pady=20)       
+            
+        else:
+            b_avanti = Button(frame, text="->", command=forward)
+            b_avanti.grid(row=i, column = 3, sticky = W)
+            b_indietro = Button(frame, text="<-", command=back)
+            b_indietro.grid(row=i, column = 2, sticky = E)              
+            b_update = Button(frame, text="Update", command=update, width = 8)
+            b_update.grid(row=i+2, column =2, sticky = N, pady=20)
+            b_delete = Button(frame, text="Delete", command=delete, width = 8)
+            b_delete.grid(row=i+2, column =3, sticky = N, pady=20)       
         
-    else:
-        b_avanti = Button(frame, text="->", command=forward)
-        b_avanti.grid(row=i, column = 3, sticky = W)
-        b_indietro = Button(frame, text="<-", command=back)
-        b_indietro.grid(row=i, column = 2, sticky = E)              
-        b_update = Button(frame, text="Update", command=update, width = 8)
-        b_update.grid(row=i+2, column =2, sticky = N, pady=20)
-        b_delete = Button(frame, text="Delete", command=delete, width = 8)
-        b_delete.grid(row=i+2, column =3, sticky = N, pady=20)       
-        
-def scrolled_view(main, dbname, tablename, t, record):
+def scrolled_view(main, dbname, tablename, t, record, ed):
     
     def on_mousewheel(event):
         canvas.yview_scroll(-1*(event.delta/120), "units")
@@ -240,6 +255,8 @@ def scrolled_view(main, dbname, tablename, t, record):
     global root
     global tablename_1
     global dbname_1
+    global editable 
+    editable = ed
     root = main    
     tablename_1 = tablename
     dbname_1 = dbname
@@ -278,19 +295,20 @@ def scrolled_view(main, dbname, tablename, t, record):
 
     canvas.config(scrollregion=canvas.bbox("all"))
     
-def get_record(event):    
+def get_record(event): 
+    global editable   
     ## free up memory 
     for item in root.grid_slaves():
         item.destroy()       
     global buttons    
     record = buttons[event.widget]       
-    scrolled_view(root,dbname_1, tablename_1,'r', record)
+    scrolled_view(root,dbname_1, tablename_1,'r', record, editable)
     
 def new_record(event):
     ## free up memory 
     for item in root.grid_slaves():
         item.destroy()          
-    scrolled_view(root,dbname_1, tablename_1,'r', -1)
+    scrolled_view(root,dbname_1, tablename_1,'r', -1, editable)
     
 def sort_by(event):
     ## free up memory 
@@ -302,7 +320,7 @@ def sort_by(event):
     global ad     
     if ad == 'DESC': ad = 'ASC'
     else: ad = 'DESC'             
-    scrolled_view(root,dbname_1, tablename_1,'g',sort)
+    scrolled_view(root,dbname_1, tablename_1,'g',sort, editable)
     
 def filter_records(event):
     global searchbox 
@@ -313,7 +331,7 @@ def filter_records(event):
     for item in root.grid_slaves():
         item.destroy() 
     ### Recreate grid with filter if exist               
-    scrolled_view(root,dbname_1, tablename_1,'g',0)
+    scrolled_view(root,dbname_1, tablename_1,'g',0, editable)
     
 def make_CVS(event):
     f = tkFileDialog.asksaveasfile(mode='w', defaultextension=".csv")
