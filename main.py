@@ -1,9 +1,9 @@
 # Author: Gianfranco Barone
 # Date: 2016-05-03
 
-# Nores:
+# Notes:
 # Views is supported but they need the have editable parameter set to false or it will raise an exception
-# You can use table referenced by FK keys as enum. The deafualt sorting for enum is by value, 
+# You can use table referenced by FK keys as enum. The default sorting for enum is by value, 
 # if you want it rowid (FIFO) you must name the table as tablename + '_EBRI'.
 # If you want some columns being not visible add '_NV' to the column name.
 # In order to check the correct value format you can use the SQLITE builtin 'Check' function or a Trigger.
