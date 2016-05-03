@@ -1,16 +1,19 @@
+# Author: Gianfranco Barone
+# Date: 2016-05-03
+
+# Nores:
+# Views is supported but they need the have editable parameter set to false or it will raise an exception
+# You can use table referenced by FK keys as enum. The deafualt sorting for enum is by value, 
+# if you want it rowid (FIFO) you must name the table as tablename + '_EBRI'.
+# If you want some columns being not visible add '_NV' to the column name.
+# In order to check the correct value format you can use the SQLITE builtin 'Check' function or a Trigger.
+
 from Tkinter import *
 from pydbforms import dataview
 
 # Note: table names are case sensitive
 tablename = 'Customers'
 tablename2 = 'OrderDetails'
-# Nores:
-# Views is supported but they need the have editable parameter set to false or it will raise an exception
-# You can use table referenced by FK keys as enum. The deafualt sorting for enum is by value, 
-# if you want it rowid (FIFO) you must name the table as tablename + '_EBRI'.
-# In order to check the value you can use the SQLITE builtin 'Check' function or a Trigger.
-
-
 report = 'report_view'
 
 DBname='testdb.db'
