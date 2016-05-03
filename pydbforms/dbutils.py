@@ -60,8 +60,12 @@ def get_table_fk(mDBname, mTable):
     for d in data:
         f_table = str(d[2])
         f_column = str(d[4])
-        column_with_fk = str(d[3])          
-        s = "select " + f_column + " from " + f_table + " order by " + f_column               
+        column_with_fk = str(d[3]) 
+        # If table name with _EBRI (Enum By RowId) it will sort by ROWID instead of sorting by column  
+        if f_table[:5] == '_EBRI':
+                    s = "select " + f_column + " from " + f_table + " order by ROWID"
+        else: 
+            s = "select " + f_column + " from " + f_table + " order by " + f_column               
         cur.execute(s)
         values = cur.fetchall()           
         fk_values.append([r[0] for r in values])               

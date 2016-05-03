@@ -19,8 +19,7 @@ menubar = Menu(root)
 # 1. Root app 
 # 2. database filename and path 
 # 3. Table name 
-# 4. Type 'r' for record view 'g' for grid view 
-# 5. Sort by column index (first column is 0) 
+# 4. Type 'r' for record view 'g' for grid view # 5. Sort by column index (first column is 0) 
 # 6. Editable parametr: if set to True you can make CRUD on data. 
 
 filemenu = Menu(menubar, tearoff=0)
