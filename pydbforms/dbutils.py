@@ -61,7 +61,7 @@ def get_table_fk(mDBname, mTable):
         f_table = str(d[2])
         f_column = str(d[4])
         column_with_fk = str(d[3]) 
-        # If table name with _EBRI (Enum By RowId) it will sort by ROWID instead of sorting by column  
+        # If table name end with _EBRI (Enum By RowId) it will sort by ROWID instead of sorting by column  
         if f_table[:5] == '_EBRI':
                     s = "select " + f_column + " from " + f_table + " order by ROWID"
         else: 
