@@ -4,6 +4,9 @@ from pydbforms import dataview
 # Note: table names are case sensitive
 tablename = 'Customers'
 tablename2 = 'OrderDetails'
+# Views is supported but they need the editable parameter set to false
+report = 'report_view'
+
 DBname='testdb.db'
 
 root = Tk()
@@ -25,6 +28,7 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Grid view " + tablename, command=lambda: dataview.scrolled_view(root,DBname,tablename,'g',0,False))
 #filemenu.add_command(label="Record view Test Table2", command=lambda: dataview.scrolled_view(root,DBname,tablename2,'r',0,True))
 filemenu.add_command(label="Grid view " + tablename2, command=lambda: dataview.scrolled_view(root,DBname,tablename2,'g',0,True))
+filemenu.add_command(label="Grid view " + report, command=lambda: dataview.scrolled_view(root,DBname,report,'g',2,False))
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=root.quit)
 menubar.add_cascade(label="Tables", menu=filemenu)

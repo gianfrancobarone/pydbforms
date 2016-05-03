@@ -240,10 +240,10 @@ def record_view(frame, mTable, mDBname, record=0):
             b_create.grid(row=i+2, column =1, sticky = N, pady=20)       
             
         else:
-            b_avanti = Button(frame, text="->", command=forward)
-            b_avanti.grid(row=i, column = 3, sticky = W)
-            b_indietro = Button(frame, text="<-", command=back)
-            b_indietro.grid(row=i, column = 2, sticky = E)              
+            #b_avanti = Button(frame, text="->", command=forward)
+            #b_avanti.grid(row=i, column = 3, sticky = W)
+            #b_indietro = Button(frame, text="<-", command=back)
+            #b_indietro.grid(row=i, column = 2, sticky = E)              
             b_update = Button(frame, text="Update", command=update, width = 8)
             b_update.grid(row=i+2, column =2, sticky = N, pady=20)
             b_delete = Button(frame, text="Delete", command=delete, width = 8)
