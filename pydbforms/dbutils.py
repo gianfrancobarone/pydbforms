@@ -31,10 +31,15 @@ def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):
         pk_col = ''
         #col_types = []
         for d in data:
-            col_names.append(str(d[1]))
-            if (str(d[5]) == '1'):
-                pk_col = str(d[1])                     
-        cur.execute("select * from " + mTable + " order by " + col_names[sort] + ' ' + ad)    
+            column = str(d[1])            
+            if column[-3:] != '_NV':
+                col_names.append(column)
+                if (str(d[5]) == '1'): pk_col = str(d[1])
+        cols = ''
+        for col_name in col_names:
+            cols = cols + col_name + ','
+        cols = cols[:-1]                     
+        cur.execute("select " + cols + " from " + mTable + " order by " + col_names[sort] + ' ' + ad)    
         ## Get table data
         data = []
         data_number = 0
@@ -62,7 +67,7 @@ def get_table_fk(mDBname, mTable):
         f_column = str(d[4])
         column_with_fk = str(d[3]) 
         # If table name end with _EBRI (Enum By RowId) it will sort by ROWID instead of sorting by column  
-        if f_table[:5] == '_EBRI':
+        if f_table[-5:] == '_EBRI':
                     s = "select " + f_column + " from " + f_table + " order by ROWID"
         else: 
             s = "select " + f_column + " from " + f_table + " order by " + f_column               
