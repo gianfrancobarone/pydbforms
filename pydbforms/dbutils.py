@@ -109,11 +109,8 @@ def update(mDBname, tablename, cols, new_values, old_values):
     string = string[:-1] + " where " 
     for i in range(0,len(cols)):
         string = string + " " + cols[i] + " =? AND "                     
-    string = string[:-4] + ';'  
-    print string
-    print tuple(new_values + old_values)  
-    curs.execute(string, tuple(new_values + old_values))  
-         
+    string = string[:-4] + ';'       
+    curs.execute(string, tuple(new_values + old_values))        
     conn.commit()  
     curs.close()
     conn.close()
