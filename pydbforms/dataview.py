@@ -140,7 +140,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 idx = fk_columns.index(name)                         
                 b = ttk.Combobox(frame, textvariable= strValues[name], state='readonly')
                 b['values'] = fk_values[idx]
-                if (rows[record][i] == None) or (record == -1): 
+                if (record == -1): 
                     b.current(0)
                 else:
                     b.set(rows[record][i])                               
@@ -150,7 +150,7 @@ def record_view(frame, mTable, mDBname, record=0):
                 e = Entry(frame, bg = 'white', fg = 'black', insertbackground='black', readonlybackground='gray55')
                 e.grid(row=i, column=1, columnspan=3)
                 entry[name] = e                
-                if (rows[record][i] == None) or (record == -1): 
+                if (record == -1): #rows[record][i] == None) or (record == -1): 
                     e.insert(0,'')
                 else:
                     e.insert(0,rows[record][i])

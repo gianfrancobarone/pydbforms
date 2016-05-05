@@ -19,6 +19,9 @@ def create_table():
        SALARY         REAL);''')
     print "Table created successfully"
     
+def quote_escape(s):
+    s.find("'")
+    
 # Pragma return data in this order: table column id, column name, column type, is not null, default value, is PK
 def get_table_metadata(mDBname, mTable, sort=0, ad='ASC'):    
     try:        
@@ -87,39 +90,30 @@ def create(mDBname,tablename,cols,values):
         string1 = string1 + col + ","           
     string1 = string1[:-1] + ") "
     i = 0    
-    string2 = "values ("        
-    for value in values:        
-        value = "'" + values[i] + "'"    
-        if values[i] == '': value = 'null'           
-        string2 = string2 + value + ","
-        i = i + 1
+    string2 = "values ("    
+    for value in values:
+        string2 = string2 + '?,'   
     string2 = string2[:-1] + ")" 
-    string = string1 + string2 + ';'                       
-    curs.execute(string)        
+    string = string1 + string2 + ';'#                        
+    curs.execute(string, tuple(values))        
     conn.commit()  
     curs.close()
     conn.close()
     
 def update(mDBname, tablename, cols, new_values, old_values):    
     conn = sqlite3.connect(mDBname)
-    curs = conn.cursor() 
-    # String construction       
-    string = "update " + tablename + " set"
+    curs = conn.cursor()     
+    string = "update " + tablename + " set"    
     for i in range(0,len(cols)):
-        string = string + " " + cols[i] + " = " 
-        value = "'" + new_values[i] + "'"    
-        if new_values[i] == '': value = 'null'  
-        string = string + value + ","
-    string = string[:-1] + " where "         
+        string = string + " " + cols[i] + "=?,"         
+    string = string[:-1] + " where " 
     for i in range(0,len(cols)):
-        string = string + " " + cols[i] + " = " 
-        value = "'" + str(old_values[i]) + "'"    
-        if old_values[i] == '': 
-            string = string[:-2]
-            value = "is null"  
-        string = string + value + " AND "              
-    string = string[:-4] + ';'    
-    curs.execute(string)    
+        string = string + " " + cols[i] + " =? AND "                     
+    string = string[:-4] + ';'  
+    print string
+    print tuple(new_values + old_values)  
+    curs.execute(string, tuple(new_values + old_values))  
+         
     conn.commit()  
     curs.close()
     conn.close()
