@@ -1,10 +1,10 @@
 #PyDBforms
 
 ####What is PyDbforms? 
-PyDbforms is a db forms  generator for sqlite. Basically the idea behind is to create a python library to  make GUI CRUD operations just telling to python the name of the table e the sqlite file. Ok that's enough for now. More to come!
+PyDbforms is a db forms  generator for sqlite. Basically the idea behind is to create a python library to  make GUI CRUD operations via python GUI.
 
 ####Current development 
-Basically it's still a prototype but is working. You can use it to look at the code to got some ideas but is not ready for production. Critics, comments and suggestions are welcome !
+It's still a prototype but is working. You can use it to look at the code to got some ideas but is not ready for production. Critics, comments and suggestions are welcome !
 
 ####Getting started!
 Download it from the repository and make a first test by simply modify the main.py file: put your sqlite3 database in the same directory change the database name variable 'Dbname' and table variable 'tablename' (and 'tablename2' if you want) and you are ready. Adding more table is very easy just follow the code...
